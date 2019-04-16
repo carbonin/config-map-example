@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cat /opt/test/config/*
+tail -f /dev/null

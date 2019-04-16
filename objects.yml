@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: custom-amounts
+  data:
+    custom.yml: |
+      # Number of generated items
+      amounts:
+        container_images: 50000
+        container_groups: 1000000
+        container_nodes: 500000
+        container_projects: 10000
+        container_templates: 50000
+        flavors: 50000
+        service_instances: 100000
+        service_offerings: 100000
+        service_offering_icons: 5000
+        service_plans: 500000
+        source_regions: 50000
+        volumes: 100000              # belongs_to [:volume_type, :source_region]
+        volume_types: 50000
+        vms: 100000                  # belongs_to [:flavor]
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: config-map-test
+  spec:
+    triggers:
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: config-map-test
+    template:
+      metadata:
+        name: config-map-test
+        labels:
+          name: config-map-test
+      spec:
+        containers:
+        - image: docker.io/carbonin/config-test:latest
+          name: config-map-test
+          volumeMounts:
+          - name: custom-config
+            mountPath: /opt/test/config/custom.yml
+            subPath: custom.yml
+        volumes:
+        - name: custom-config
+          configMap:
+            name: custom-amounts
